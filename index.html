@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Asistente Alfa Sky</title>
+  <style>
+    body, html { margin: 0; padding: 0; }
+    #chatContainer {
+      width: 100%;
+      max-width: 380px;
+      height: 600px;
+      border: 1px solid #222;
+      background: #0c1330;
+      font-family: system-ui, sans-serif;
+      color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+    .messages { flex: 1; padding: 12px; overflow-y: auto; font-size: 14px; }
+    .input-row { display: flex; border-top: 1px solid #1c2350; }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: #0b1028;
+      color: #f2f2f2;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      background: #d6c08a;
+      color: #0a1022;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .msg-bot { margin-bottom: 8px; padding: 8px; background: #1e2646; border-radius: 4px; }
+    .msg-user { text-align: right; margin-bottom: 8px; padding: 8px; background: #39417a; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div id="chatContainer">
+  <div class="messages" id="messages"></div>
+  <div class="input-row">
+    <input type="text" id="userInput" placeholder="Escribí aquí..." disabled />
+    <button id="sendBtn">Enviar</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const wsNumber = "5491135151981"; // Número de WhatsApp
+  const messages = document.getElementById("messages");
+  const input = document.getElementById("userInput");
+  const btn = document.getElementById("sendBtn");
+
+  let step = 0;
+  const info = {};
+
+  function bot(text) {
+    messages.innerHTML += '<div class="msg-bot">' + text + "</div>";
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function user(text) {
+    messages.innerHTML += '<div class="msg-user">' + text + "</div>";
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function askNext() {
+    input.disabled = false;
+    input.value = "";
+    input.focus();
+
+    switch (step) {
+      case 0:
+        bot("👋 Hola, soy el asistente de ALFA SKY. ¿Desde qué ciudad o aeropuerto querés volar?");
+        break;
+      case 1:
+        bot("¿Hacia qué destino?");
+        break;
+      case 2:
+        bot("¿Cuántos pasajeros?");
+        break;
+      case 3:
+        bot("¿Qué tipo de avión preferís? (Jet / Turbohélice)");
+        break;
+      default:
+        finalize();
+    }
+  }
+
+  function detectAgency(txt) {
+    return /agencia|broker|operador|viajes|tour/i.test(txt);
+  }
+
+  function finalize() {
+    const msg = encodeURIComponent(
+      `Hola Alfa Sky, quiero cotizar un vuelo:\nOrigen: ${info.origen}\nDestino: ${info.destino}\nPasajeros: ${info.pasajeros}\nTipo de avión: ${info.tipo}`
+    );
+
+    bot("Gracias. Si querés avanzar, te paso con nuestro equipo.");
+    bot('<a href="https://wa.me/' + wsNumber + '?text=' + msg + '" target="_blank">📲 Abrir WhatsApp</a>');
+    input.disabled = true;
+    btn.disabled = true;
+  }
+
+  btn.addEventListener("click", () => {
+    const txt = input.value.trim();
+    if (!txt) return;
+
+    user(txt);
+    input.disabled = true;
+
+    if (step === 0) {
+      if (detectAgency(txt)) {
+        bot("Gracias por tu consulta como agencia/broker. Te paso con nuestro encargado.");
+        bot('<a href="https://wa.me/' + wsNumber + '" target="_blank">📲 Contactar por WhatsApp</a>');
+        input.disabled = true;
+        btn.disabled = true;
+        return;
+      }
+      info.origen = txt;
+    } else if (step === 1) {
+      info.destino = txt;
+    } else if (step === 2) {
+      info.pasajeros = txt;
+    } else if (step === 3) {
+      info.tipo = txt;
+    }
+
+    step++;
+    askNext();
+  });
+
+  askNext();
+})();
+</script>
+
+</body>
+</html>
