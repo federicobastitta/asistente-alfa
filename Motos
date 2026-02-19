@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Plan de negocio — Concesionaria de motos</title>
+
+<style>
+:root{
+  --bg:#0f1830;
+  --bg2:#111f3b;
+
+  --panel:rgba(255,255,255,.06);
+  --panel2:rgba(255,255,255,.045);
+
+  --text:#eef2ff;
+  --muted:#c2cbe6;
+  --line:rgba(255,255,255,.16);
+
+  --primary:#173791;
+  --secondary:#4A7BD0;
+
+  --mono: ui-monospace, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+
+  --radius:14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--text);
+  background:
+    radial-gradient(1000px 520px at 12% 0%, rgba(74,123,208,.28), transparent 60%),
+    radial-gradient(900px 520px at 88% 10%, rgba(23,55,145,.26), transparent 55%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+}
+
+/* Efecto lectura */
+.readProgress{
+  position:fixed;
+  top:0; left:0;
+  height:3px;
+  width:0%;
+  background:linear-gradient(90deg, rgba(74,123,208,.95), rgba(23,55,145,.95));
+  z-index:9999;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:20px 14px 34px;
+}
+
+/* Header */
+header{
+  border:1px solid var(--line);
+  padding:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.04));
+  border-radius:var(--radius);
+}
+h1{margin:0;font-size:18px;letter-spacing:.2px}
+.meta{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.5}
+
+/* Bloque “Valores iniciales” (más grande y visible) */
+.heroNums{
+  margin-top:12px;
+  border:1px solid rgba(74,123,208,.28);
+  background:rgba(74,123,208,.10);
+  border-radius:var(--radius);
+  padding:12px 12px;
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:10px;
+}
+.heroItem{
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.03);
+  border-radius:12px;
+  padding:10px 10px;
+}
+.heroItem .hLabel{
+  font-size:11px;
+  color:var(--muted);
+  margin:0 0 6px 0;
+}
+.heroItem .hValue{
+  margin:0;
+  font-size:22px;
+  font-weight:850;
+  letter-spacing:.2px;
+}
+.heroItem .hNote{
+  margin:6px 0 0 0;
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.35;
+}
+.heroItem.primary{
+  border-color: rgba(74,123,208,.50);
+  background: linear-gradient(180deg, rgba(74,123,208,.20), rgba(255,255,255,.03));
+}
+.heroItem.primary .hValue{
+  font-size:28px; /* más grande para el valor de la moto */
+}
+
+/* Sections */
+.section{
+  margin-top:14px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border-radius:var(--radius);
+  overflow:hidden;
+  opacity:.88;
+  transform: translateY(6px);
+  transition: opacity .35s ease, transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.section.inview{opacity:1;transform: translateY(0)}
+.section.active{
+  border-color: rgba(74,123,208,.55);
+  box-shadow: 0 10px 30px rgba(0,0,0,.20);
+}
+
+/* Guía izquierda */
+@media(min-width: 900px){
+  .section{position:relative;}
+  .section::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0;
+    width:4px;
+    background: linear-gradient(180deg, rgba(74,123,208,.85), rgba(23,55,145,.65));
+    opacity:.18;
+    transition: opacity .35s ease;
+  }
+  .section.active::before{opacity:.60;}
+}
+
+.sectionHead{
+  padding:12px 16px;
+  border-bottom:1px solid var(--line);
+  background:rgba(23,55,145,.16);
+}
+.sectionHead h2{margin:0;font-size:14px}
+.sub{color:var(--muted);font-size:12px;margin:6px 0 0;line-height:1.55}
+.sectionBody{padding:14px 16px}
+
+/* KPI */
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:12px;
+}
+.kpi{
+  border:1px solid var(--line);
+  padding:12px;
+  background:rgba(255,255,255,.035);
+  border-radius:12px;
+}
+.label{font-size:11px;color:var(--muted);margin:0 0 6px}
+.value{font-size:20px;font-weight:750;margin:0}
+.note{font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.4}
+
+/* Tables */
+.table{
+  width:100%;
+  border:1px solid var(--line);
+  border-collapse:collapse;
+  font-size:12px;
+  background:rgba(255,255,255,.02);
+  border-radius:12px;
+  overflow:hidden;
+}
+.table th,.table td{
+  padding:10px 10px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  vertical-align:top;
+}
+.table th{
+  background:rgba(23,55,145,.20);
+  color:#e8eeff;
+  font-weight:650;
+}
+.table tr:last-child td{border-bottom:none}
+.right{text-align:right;font-family:var(--mono);white-space:nowrap}
+
+/* Mobile cards */
+.cards{display:none; gap:10px;}
+.cardRow{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  padding:12px;
+  border-radius:12px;
+}
+.cardRow .rowTitle{
+  font-size:12px;
+  color:#eef2ff;
+  font-weight:700;
+  margin:0 0 8px;
+}
+.kv{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:8px 12px;
+  font-size:12px;
+}
+.kv div{color:var(--muted)}
+.kv .val{color:var(--text);font-family:var(--mono);white-space:nowrap;text-align:right}
+
+.stackNote{margin:10px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
+
+/* Legend */
+.legend{
+  margin-top:18px;
+  border:1px dashed rgba(255,255,255,.24);
+  padding:14px;
+  background:rgba(74,123,208,.10);
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.65;
+  border-radius:var(--radius);
+}
+.legend strong{color:#fff}
+
+/* Responsive */
+@media(max-width: 980px){
+  .kpis{grid-template-columns:repeat(2, minmax(0,1fr))}
+  .heroNums{grid-template-columns:repeat(2, minmax(0,1fr))}
+}
+@media(max-width: 640px){
+  .wrap{padding:16px 12px 26px}
+  h1{font-size:16px}
+  .sectionBody{padding:12px}
+  .kpis{grid-template-columns:1fr}
+  .heroNums{grid-template-columns:1fr}
+  .table{display:none;}
+  .cards{display:grid;}
+}
+</style>
+</head>
+
+<body>
+<div class="readProgress" id="readProgress"></div>
+
+<div class="wrap">
+  <header>
+    <h1>Plan de negocio — Concesionaria de motos con financiación y accesorios</h1>
+    <div class="meta">Venta presencial — Integración con importador — Stock exhibición: 30 unidades</div>
+
+    <!-- VALORES INICIALES (más grandes) -->
+    <div class="heroNums" aria-label="Valores iniciales del modelo">
+      <div class="heroItem primary">
+        <p class="hLabel">Valor de la moto (USD)</p>
+        <p class="hValue">2.000</p>
+        <p class="hNote">Precio promedio de referencia</p>
+      </div>
+      <div class="heroItem">
+        <p class="hLabel">Patentamiento (USD)</p>
+        <p class="hValue">200</p>
+        <p class="hNote">Costos asociados al alta</p>
+      </div>
+      <div class="heroItem">
+        <p class="hLabel">Accesorios (USD)</p>
+        <p class="hValue">100</p>
+        <p class="hNote">Attach promedio por operación</p>
+      </div>
+      <div class="heroItem">
+        <p class="hLabel">Intereses (USD)</p>
+        <p class="hValue">1.100</p>
+        <p class="hNote">Total por financiación (24 meses)</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1) INDICADORES -->
+  <section class="section" data-section>
+    <div class="sectionHead">
+      <h2>1) Indicadores clave</h2>
+      <p class="sub">
+        Supuestos base (promedio por operación): moto USD 2.000 + patentamiento USD 200 + accesorios USD 100 +
+        intereses totales por financiación USD 1.100 (plazo 24 meses).
+      </p>
+    </div>
+
+    <div class="sectionBody">
+      <div class="kpis">
+        <div class="kpi">
+          <p class="label">Total pagado por cliente (unidad)</p>
+          <p class="value">USD 3.400</p>
+          <p class="note">Moto + patentamiento + accesorios + intereses</p>
+        </div>
+
+        <div class="kpi">
+          <p class="label">Ganancia total estimada (unidad)</p>
+          <p class="value">USD 1.450</p>
+          <p class="note">Venta + financiación + accesorios</p>
+        </div>
+
+        <div class="kpi">
+          <p class="label">Costos fijos mensuales</p>
+          <p class="value">USD 35.000</p>
+          <p class="note">Alquiler + estructura + operación</p>
+        </div>
+
+        <div class="kpi">
+          <p class="label">Punto de equilibrio</p>
+          <p class="value">25 motos/mes</p>
+          <p class="note">35.000 / 1.450</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2) PROYECCIÓN -->
+  <section class="section" data-section>
+    <div class="sectionHead">
+      <h2>2) Proyección de rentabilidad por volumen</h2>
+      <p class="sub">Ganancia neta mensual (USD) = (motos/mes × 1.450) − 35.000</p>
+    </div>
+
+    <div class="sectionBody">
+      <table class="table" aria-label="Proyección de rentabilidad">
+        <thead>
+          <tr>
+            <th>Motos/mes</th>
+            <th class="right">Ganancia bruta (USD)</th>
+            <th class="right">Costos fijos (USD)</th>
+            <th class="right">Ganancia neta (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>30</td><td class="right">43.500</td><td class="right">35.000</td><td class="right">8.500</td></tr>
+          <tr><td>50</td><td class="right">72.500</td><td class="right">35.000</td><td class="right">37.500</td></tr>
+          <tr><td>100</td><td class="right">145.000</td><td class="right">35.000</td><td class="right">110.000</td></tr>
+          <tr><td>150</td><td class="right">217.500</td><td class="right">35.000</td><td class="right">182.500</td></tr>
+        </tbody>
+      </table>
+
+      <div class="cards" aria-label="Proyección de rentabilidad (formato móvil)">
+        <div class="cardRow">
+          <p class="rowTitle">30 motos/mes</p>
+          <div class="kv">
+            <div>Ganancia bruta (USD)</div><div class="val">43.500</div>
+            <div>Costos fijos (USD)</div><div class="val">35.000</div>
+            <div>Ganancia neta (USD)</div><div class="val">8.500</div>
+          </div>
+        </div>
+        <div class="cardRow">
+          <p class="rowTitle">50 motos/mes</p>
+          <div class="kv">
+            <div>Ganancia bruta (USD)</div><div class="val">72.500</div>
+            <div>Costos fijos (USD)</div><div class="val">35.000</div>
+            <div>Ganancia neta (USD)</div><div class="val">37.500</div>
+          </div>
+        </div>
+        <div class="cardRow">
+          <p class="rowTitle">100 motos/mes</p>
+          <div class="kv">
+            <div>Ganancia bruta (USD)</div><div class="val">145.000</div>
+            <div>Costos fijos (USD)</div><div class="val">35.000</div>
+            <div>Ganancia neta (USD)</div><div class="val">110.000</div>
+          </div>
+        </div>
+        <div class="cardRow">
+          <p class="rowTitle">150 motos/mes</p>
+          <div class="kv">
+            <div>Ganancia bruta (USD)</div><div class="val">217.500</div>
+            <div>Costos fijos (USD)</div><div class="val">35.000</div>
+            <div>Ganancia neta (USD)</div><div class="val">182.500</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="stackNote">En pantallas chicas se usa formato listado para evitar desplazamiento horizontal.</p>
+    </div>
+  </section>
+
+  <!-- 3) PORTAFOLIO MOTOS -->
+  <section class="section" data-section>
+    <div class="sectionHead">
+      <h2>3) Portafolio comercial (20 modelos)</h2>
+      <p class="sub">Referencias de catálogo para definir mix y ampliar demanda.</p>
+    </div>
+
+    <div class="sectionBody">
+      <table class="table" aria-label="Portafolio de motos">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Segmento</th>
+            <th class="right">Cc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Yamaha</td><td>YZ250F</td><td>Enduro</td><td class="right">250</td></tr>
+          <tr><td>2</td><td>Yamaha</td><td>YZ 250</td><td>Enduro</td><td class="right">250</td></tr>
+          <tr><td>3</td><td>Yamaha</td><td>YZ 125</td><td>Enduro</td><td class="right">125</td></tr>
+          <tr><td>4</td><td>Yamaha</td><td>R7</td><td>Sport</td><td class="right">700</td></tr>
+          <tr><td>5</td><td>Yamaha</td><td>MT 09</td><td>Naked</td><td class="right">900</td></tr>
+          <tr><td>6</td><td>Yamaha</td><td>Tenere 700</td><td>On-Off</td><td class="right">700</td></tr>
+          <tr><td>7</td><td>Yamaha</td><td>FZ 25</td><td>Urbana</td><td class="right">250</td></tr>
+          <tr><td>8</td><td>Yamaha</td><td>XMAX 300</td><td>Scooter</td><td class="right">300</td></tr>
+          <tr><td>9</td><td>Yamaha</td><td>FZ 150</td><td>Urbana</td><td class="right">150</td></tr>
+          <tr><td>10</td><td>KOVE</td><td>MX 250</td><td>Off-road</td><td class="right">250</td></tr>
+          <tr><td>11</td><td>KOVE</td><td>450 Rally</td><td>Rally</td><td class="right">450</td></tr>
+          <tr><td>12</td><td>KOVE</td><td>800 X PRO</td><td>Aventura</td><td class="right">800</td></tr>
+          <tr><td>13</td><td>TVS</td><td>NEO NX 110</td><td>Urbana</td><td class="right">110</td></tr>
+          <tr><td>14</td><td>TVS</td><td>RTR 160</td><td>Naked</td><td class="right">160</td></tr>
+          <tr><td>15</td><td>GAF</td><td>GX 110</td><td>Urbana</td><td class="right">110</td></tr>
+          <tr><td>16</td><td>GAF</td><td>JL 90</td><td>Urbana</td><td class="right">90</td></tr>
+          <tr><td>17</td><td>GAF</td><td>JL 50</td><td>Urbana</td><td class="right">50</td></tr>
+          <tr><td>18</td><td>GAF</td><td>GX 140</td><td>Utilitaria</td><td class="right">140</td></tr>
+          <tr><td>19</td><td>Motomel</td><td>Blitz 110</td><td>Urbana</td><td class="right">110</td></tr>
+          <tr><td>20</td><td>Motomel</td><td>S2 150</td><td>Urbana</td><td class="right">150</td></tr>
+        </tbody>
+      </table>
+
+      <div class="cards" aria-label="Portafolio de motos (formato móvil)">
+        <div class="cardRow"><p class="rowTitle">#1 — Yamaha YZ250F</p><div class="kv"><div>Segmento</div><div class="val">Enduro</div><div>Cc</div><div class="val">250</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#2 — Yamaha YZ 250</p><div class="kv"><div>Segmento</div><div class="val">Enduro</div><div>Cc</div><div class="val">250</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#3 — Yamaha YZ 125</p><div class="kv"><div>Segmento</div><div class="val">Enduro</div><div>Cc</div><div class="val">125</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#4 — Yamaha R7</p><div class="kv"><div>Segmento</div><div class="val">Sport</div><div>Cc</div><div class="val">700</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#5 — Yamaha MT 09</p><div class="kv"><div>Segmento</div><div class="val">Naked</div><div>Cc</div><div class="val">900</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#6 — Yamaha Tenere 700</p><div class="kv"><div>Segmento</div><div class="val">On-Off</div><div>Cc</div><div class="val">700</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#7 — Yamaha FZ 25</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">250</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#8 — Yamaha XMAX 300</p><div class="kv"><div>Segmento</div><div class="val">Scooter</div><div>Cc</div><div class="val">300</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#9 — Yamaha FZ 150</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">150</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#10 — KOVE MX 250</p><div class="kv"><div>Segmento</div><div class="val">Off-road</div><div>Cc</div><div class="val">250</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#11 — KOVE 450 Rally</p><div class="kv"><div>Segmento</div><div class="val">Rally</div><div>Cc</div><div class="val">450</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#12 — KOVE 800 X PRO</p><div class="kv"><div>Segmento</div><div class="val">Aventura</div><div>Cc</div><div class="val">800</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#13 — TVS NEO NX 110</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">110</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#14 — TVS RTR 160</p><div class="kv"><div>Segmento</div><div class="val">Naked</div><div>Cc</div><div class="val">160</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#15 — GAF GX 110</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">110</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#16 — GAF JL 90</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">90</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#17 — GAF JL 50</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">50</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#18 — GAF GX 140</p><div class="kv"><div>Segmento</div><div class="val">Utilitaria</div><div>Cc</div><div class="val">140</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#19 — Motomel Blitz 110</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">110</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#20 — Motomel S2 150</p><div class="kv"><div>Segmento</div><div class="val">Urbana</div><div>Cc</div><div class="val">150</div></div></div>
+      </div>
+
+      <p class="stackNote">En pantallas chicas el portafolio se muestra como listado para evitar desplazamiento horizontal.</p>
+    </div>
+  </section>
+
+  <!-- 4) ACCESORIOS -->
+  <section class="section" data-section>
+    <div class="sectionHead">
+      <h2>4) Portafolio de accesorios</h2>
+      <p class="sub">Mix de attach para incrementar margen y ticket promedio por cliente.</p>
+    </div>
+
+    <div class="sectionBody">
+      <table class="table" aria-label="Portafolio de accesorios">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Categoría</th>
+            <th>Producto</th>
+            <th class="right">Impacto margen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Protección</td><td>Antiparras</td><td class="right">Alto</td></tr>
+          <tr><td>2</td><td>Protección</td><td>Pechera</td><td class="right">Alto</td></tr>
+          <tr><td>3</td><td>Protección</td><td>Rodilleras</td><td class="right">Alto</td></tr>
+          <tr><td>4</td><td>Protección</td><td>Coderas</td><td class="right">Medio-alto</td></tr>
+          <tr><td>5</td><td>Confort</td><td>Faja lumbar</td><td class="right">Medio</td></tr>
+          <tr><td>6</td><td>Hidratación</td><td>Mochila hidratante</td><td class="right">Medio</td></tr>
+          <tr><td>7</td><td>Transporte</td><td>Mochilas / bolsos</td><td class="right">Medio</td></tr>
+          <tr><td>8</td><td>Utilitario</td><td>Zunchos</td><td class="right">Medio</td></tr>
+          <tr><td>9</td><td>Indumentaria</td><td>Medias técnicas</td><td class="right">Medio</td></tr>
+          <tr><td>10</td><td>Kit</td><td>Combo protección</td><td class="right">Alto</td></tr>
+        </tbody>
+      </table>
+
+      <div class="cards" aria-label="Portafolio de accesorios (formato móvil)">
+        <div class="cardRow"><p class="rowTitle">#1 — Protección</p><div class="kv"><div>Producto</div><div class="val">Antiparras</div><div>Impacto margen</div><div class="val">Alto</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#2 — Protección</p><div class="kv"><div>Producto</div><div class="val">Pechera</div><div>Impacto margen</div><div class="val">Alto</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#3 — Protección</p><div class="kv"><div>Producto</div><div class="val">Rodilleras</div><div>Impacto margen</div><div class="val">Alto</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#4 — Protección</p><div class="kv"><div>Producto</div><div class="val">Coderas</div><div>Impacto margen</div><div class="val">Medio-alto</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#5 — Confort</p><div class="kv"><div>Producto</div><div class="val">Faja lumbar</div><div>Impacto margen</div><div class="val">Medio</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#6 — Hidratación</p><div class="kv"><div>Producto</div><div class="val">Mochila hidratante</div><div>Impacto margen</div><div class="val">Medio</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#7 — Transporte</p><div class="kv"><div>Producto</div><div class="val">Mochilas / bolsos</div><div>Impacto margen</div><div class="val">Medio</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#8 — Utilitario</p><div class="kv"><div>Producto</div><div class="val">Zunchos</div><div>Impacto margen</div><div class="val">Medio</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#9 — Indumentaria</p><div class="kv"><div>Producto</div><div class="val">Medias técnicas</div><div>Impacto margen</div><div class="val">Medio</div></div></div>
+        <div class="cardRow"><p class="rowTitle">#10 — Kit</p><div class="kv"><div>Producto</div><div class="val">Combo protección</div><div>Impacto margen</div><div class="val">Alto</div></div></div>
+      </div>
+
+      <p class="stackNote">En pantallas chicas el portafolio se muestra como listado para evitar desplazamiento horizontal.</p>
+    </div>
+  </section>
+
+  <div class="legend">
+    <strong>Leyenda:</strong> Este documento constituye una estimación preliminar del modelo de negocio basada en supuestos promedio.
+    En caso de requerir mayor información, se puede desarrollar un <strong>plan más detallado</strong> incluyendo proyecciones financieras completas,
+    análisis de sensibilidad, flujo de fondos, necesidades de capital de trabajo, estructura de financiación, tasa de aprobación y escenarios de expansión.
+  </div>
+</div>
+
+<script>
+/* Barra de progreso de lectura */
+(function(){
+  const bar = document.getElementById('readProgress');
+  const onScroll = () => {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const scrollHeight = (doc.scrollHeight || document.body.scrollHeight) - doc.clientHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    bar.style.width = pct.toFixed(2) + '%';
+  };
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+})();
+
+/* Efecto lectura por sección: resalta la sección en foco */
+(function(){
+  const sections = [...document.querySelectorAll('[data-section]')];
+  if(!('IntersectionObserver' in window) || sections.length === 0){
+    sections.forEach(s => s.classList.add('inview'));
+    return;
+  }
+
+  const setActive = (el) => {
+    sections.forEach(s => s.classList.remove('active'));
+    if(el) el.classList.add('active');
+  };
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('inview');
+      }
+    });
+
+    const visible = entries
+      .filter(e => e.isIntersecting)
+      .sort((a,b) => (b.intersectionRatio - a.intersectionRatio))[0];
+    if(visible) setActive(visible.target);
+  }, {
+    threshold: [0.15, 0.35, 0.6, 0.8]
+  });
+
+  sections.forEach(s => io.observe(s));
+})();
+</script>
+</body>
+</html>
